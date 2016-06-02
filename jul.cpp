@@ -17,6 +17,7 @@ namespace {
     using namespace std::complex_literals;
 
     // rendering parameters
+    const int w = 2048, h = 2048;
     const int N = 50; // max iterations
     const srgba background = {255, 255, 255, 255};
     const srgba_light light = {-255, -255, -255, 0};
@@ -25,9 +26,37 @@ namespace {
     complex<double> C(-0.76, 0.1);
 }
 
-int main() {
+int
+main (
+    int argc,
+    char *argv[]
+)
+{
+    if( argc != 3 ) {
+        printf (
+            "usage: %s <real> <imaginary>\n"
+            "  outputs image file: jul_<real>+<imaginary>i_%dx%d.png\n"
+            "  example: %s -0.76 0.1\n",
+            argv[0], w, h, argv[0]
+        );
+        return 0;
+    }
+    else {
+        double real, imag;
+        if (
+            1 != sscanf( argv[1], "%lf", &real ) ||
+            1 != sscanf( argv[2], "%lf", &imag )
+        ) {
+            printf (
+                "error: expected two real numbers, example:\n"
+                "  %s -0.76 0.1\n",
+                argv[0]
+            );
+            return 0;
+        }
+        C = real + imag * 1i;
+    }
 
-    const int w = 2048, h = 2048;
     cout << "allocating memory for a " << w << " x " << h << " image buffer..." << flush;
     simg img( w, h, background );
     cout << " done." << endl;
@@ -54,7 +83,7 @@ int main() {
     cout << " done." << endl;
 
     char filename[1024];
-    sprintf( filename, "Q(z)=z*z+%g+%gi_%ux%u.png", C.real(), C.imag(), w, h );
+    sprintf( filename, "jul_%g+%gi_%dx%d.png", C.real(), C.imag(), w, h );
 
     img.save( string(filename) );
 
