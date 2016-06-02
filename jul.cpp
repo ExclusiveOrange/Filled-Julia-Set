@@ -18,7 +18,7 @@ namespace {
 
     // rendering parameters
     const int w = 2048, h = 2048;
-    const int N = 50; // max iterations
+    const int N = 30; // max iterations
     const srgba background = {255, 255, 255, 255};
     const srgba_light light = {-255, -255, -255, 0};
 
@@ -70,7 +70,8 @@ main (
         for( int y = 0; y < h; y++ ) {
             bool stayed = true;
             complex<double> z( x * xinc - 2.0, y * yinc - 2.0 );
-            for( int n = 0; n < N; n++ ) {
+            int n;
+            for( n = 0; n < N; n++ ) {
                 if( abs(z) > threshold ) {
                     stayed = false;
                     break;
@@ -78,6 +79,16 @@ main (
                 z = z*z + C;
             }
             if( stayed ) img.add( x, y, light );
+            else {
+                float saturation = (float)n / (float)N;
+                srgba_light plotlight = {
+                    (short)(light.r * saturation),
+                    (short)(light.g * saturation),
+                    (short)(light.b * saturation),
+                    light.a
+                };
+                img.add( x, y, plotlight );
+            }
         }
     }
     cout << " done." << endl;
